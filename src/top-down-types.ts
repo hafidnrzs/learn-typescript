@@ -81,21 +81,37 @@ function throwError(message: string): never {
 
 function infiniteLoop(): never {
     while (true) {
-        // console.log("Looping forever...");
+        console.log("Looping forever...");
     }
 }
 
 // contoh Exhaustiveness Checking
-type Shape = "circle" | "square" | "triangle";
+interface Circle {
+    kind: "circle";
+    radius: number;
+}
+
+interface Square {
+    kind: "square";
+    sideLength: number;
+}
+
+interface Triangle {
+    kind: "triangle";
+    sideLength: number;
+    height: number;
+}
+
+type Shape = Circle | Square | Triangle;
 
 function getArea(shape: Shape): number | never {
-    switch (shape) {
+    switch (shape.kind) {
         case "circle":
-            return Math.PI * 5 * 5;
+            return Math.PI * shape.radius ** 2;
         case "square":
-            return 10 * 10;
+            return shape.sideLength ** 2;
         case "triangle":
-            return (10 * 5) / 2;
+            return (shape.sideLength * shape.height) / 2;
         default:
             // TypeScript akan memastikan semua kasus di atas ditangani di switch
             const _exhaustiveCheck: never = shape;
@@ -103,15 +119,21 @@ function getArea(shape: Shape): number | never {
     }
 }
 
-console.log(`Area of circle: ${getArea("circle")}`);
+const myCircle: Circle = {
+    kind: "circle",
+    radius: 7,
+};
+
+console.log(`Area of circle: ${getArea(myCircle)}`);
 console.log(`Area of unknown: ${getArea("unknown_shape" as any)}`);
 
 try {
-    throwError("Something went terribly wrong!");
+    // throwError("Something went terribly wrong!");
 } catch (e) {
-    console.log(`Caught an error: ${e.message}`);
+    // console.log(`Caught an error: ${e.message}`);
 }
 
+// tidak bisa juga assign value ke variabel dengan tipe never
 let neverValue: never;
-neverValue = 10; // error: Type '10' is not assignable to type 'never'.
-neverValue = null; // Type 'null' is not assignable to type 'never'.
+// neverValue = 10; // error: Type '10' is not assignable to type 'never'.
+// neverValue = null; // Type 'null' is not assignable to type 'never'.
